@@ -1,1 +1,4 @@
-downloads/*
+downloads
+*.cbz
+*.cbr
+*.zip
