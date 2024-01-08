@@ -15,23 +15,23 @@ Usage of comicsdl:
 ```
 
 ```
-❯ comicsdl
-Searching : Swamp Thing
-0: Swamp Thing – Green Hell (TPB) (2023)
-1: The Swamp Thing Vol. 3 – The Parliament of Gears (TPB) (2023)
-2: Swamp Thing – Green Hell #3 (2023)
-3: Swamp Thing – Green Hell #2 (2023)
-4: The Swamp Thing Vol. 2 – Conduit (TPB) (2022)
-5: The Swamp Thing #16 (2022)
-6: The Swamp Thing #15 (2022)
-7: The Swamp Thing Vol. 1 – Becoming (TPB) (2021)
-8: The Swamp Thing #14 (2022)
-9: The Swamp Thing #13 (2022)
-10: Swamp Thing – The Bronze Age Vol. 3 (2021)
-11: The Swamp Thing #12 (2022)
+❯ comicsdl -comic "Savage Dragon" -dest dls
+Searching : Savage Dragon
+0: Savage Dragon #266 (2023)
+1: Savage Dragon – Teenage Mutant Ninja Turtles Crossover (1993)
+2: Teenage Mutant Ninja Turtles – Savage Dragon Crossover (1995)
+3: Savage Dragon #265 (2023)
+4: Savage Dragon #264 (2023)
+5: Savage Dragon #263 (2023)
+6: Savage Dragon Vol. 1 #1 – 3 + TPB (1992+2004)
+7: Savage Dragon Archives Vol. 1 – 10 (2006-2021)
+8: Savage Dragon #262 (2022)
+9: Savage Dragon #261 (2022)
+10: Savage Dragon #260 (2021)
+11: Savage Avengers Vol. 3 – Enter The Dragon (TPB) (2021)
 make selection: [0]
-2
-You chose: Swamp Thing – Green Hell #3 (2023)
-Downloading: Swamp Thing - Green Hell 003 (2023) (Digital) (Walkabout-DCP).cbz
-Done! Saved: downloads/Swamp Thing - Green Hell 003 (2023) (Digital) (Walkabout-DCP).cbz
+10
+You chose: Savage Dragon #260 (2021)
+Downloading: Savage Dragon 260 (2021) (digital) (The Seeker-Empire).cbr
+Done! Saved: dls/Savage Dragon 260 (2021) (digital) (The Seeker-Empire).cbr
 ```
