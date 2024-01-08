@@ -16,27 +16,29 @@ import (
 	"golang.org/x/net/html"
 )
 
-func GetResults(doc *html.Node) ([]*html.Node, error) {
-	var titles []*html.Node
+func parseSearch(doc *html.Node) ([]*SearchResult, error) {
+	var results []*SearchResult
 	var crawler func(*html.Node)
 	crawler = func(node *html.Node) {
 		if node.Type == html.ElementNode && node.Data == "h1" {
-			title := node
-			titles = append(titles, title)
-			return
+			var searchResult SearchResult
+			setSearchResult(node, &searchResult)
+			if searchResult.URL != "" {
+				results = append(results, &searchResult)
+			}
 		}
 		for child := node.FirstChild; child != nil; child = child.NextSibling {
 			crawler(child)
 		}
 	}
 	crawler(doc)
-	if titles != nil {
-		return titles, nil
+	if results != nil {
+		return results, nil
 	}
-	return nil, errors.New("Missing <body> in the node tree")
+	return nil, errors.New("No results found")
 }
 
-func collectText(n *html.Node, r *SearchResult) {
+func setSearchResult(n *html.Node, r *SearchResult) {
 	if n.Type == html.TextNode {
 		r.Title = n.Data
 	}
@@ -48,19 +50,20 @@ func collectText(n *html.Node, r *SearchResult) {
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		collectText(c, r)
+		setSearchResult(c, r)
 	}
 }
 
-func GetLinkNodes(doc *html.Node) ([]*html.Node, error) {
-	var links []*html.Node
+func GetLinkURLS(doc *html.Node) ([]string, error) {
+	var links []string
 	var crawler func(*html.Node)
 
 	crawler = func(node *html.Node) {
 		if node.Type == html.ElementNode && node.Data == "a" {
 			for _, a := range node.Attr {
 				if a.Val == "Download Now" {
-					links = append(links, node)
+					url := getLink(node)
+					links = append(links, url)
 					return
 				}
 			}
@@ -78,11 +81,6 @@ func GetLinkNodes(doc *html.Node) ([]*html.Node, error) {
 }
 
 type SearchResult struct {
-	Title string
-	URL   string
-}
-
-type DownloadLink struct {
 	Title string
 	URL   string
 }
@@ -106,23 +104,9 @@ func getParsedHTML(url string) (*html.Node, error) {
 	return html.Parse(bytes.NewReader(body))
 }
 
-func parseSearchResults(nodes []*html.Node) []SearchResult {
-	var searchResults []SearchResult
-
-	for _, v := range nodes {
-		var searchResult SearchResult
-		collectText(v, &searchResult)
-		if searchResult.URL != "" {
-			searchResults = append(searchResults, searchResult)
-		}
-	}
-
-	return searchResults
-}
-
-func getUserSeletion(searchResults []SearchResult) SearchResult {
+func getUserSeletion(searchResults []*SearchResult) *SearchResult {
 	for i, v := range searchResults {
-		fmt.Printf("%d: %s - %s\n", i, v.Title, v.URL)
+		fmt.Printf("%d: %s\n", i, v.Title)
 	}
 
 	// User chooses result
@@ -154,10 +138,7 @@ func getLink(node *html.Node) string {
 	return ""
 }
 
-func downloadNode(node *html.Node) error {
-	link := getLink(node)
-	fmt.Printf("Downloading: %s\n", link)
-	// Download it.
+func download(link string) error {
 	out, err := os.Create("output.txt")
 	if err != nil {
 		log.Fatalln(err)
@@ -172,10 +153,10 @@ func downloadNode(node *html.Node) error {
 	urlStr, err := url.QueryUnescape(resp.Request.URL.String())
 	parts := strings.Split(urlStr, "/")
 	last := parts[len(parts)-1]
-	fmt.Println(urlStr)
 	if !strings.Contains(last, ".cbz") && !strings.Contains(last, ".cbr") && !strings.Contains(last, ".zip") {
 		return errors.New("Invalid download")
 	}
+	fmt.Printf("Downloading: %s\n", last)
 	_, err = io.Copy(out, resp.Body)
 	err = os.Rename("output.txt", last)
 
@@ -194,11 +175,10 @@ func main() {
 		log.Fatalln(err)
 	}
 	// Parse the search results
-	results, err := GetResults(doc)
+	searchResults, err := parseSearch(doc)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	searchResults := parseSearchResults(results)
 
 	// Show the options
 	if len(searchResults) == 0 {
@@ -212,17 +192,16 @@ func main() {
 	doc, err = getParsedHTML(selection.URL)
 
 	// Find the download links
-	nodes, err := GetLinkNodes(doc)
+	urls, err := GetLinkURLS(doc)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	// Download the file
-	for _, v := range nodes {
-		err = downloadNode(v)
+	for _, v := range urls {
+		err = download(v)
 		if err == nil {
 			return
 		}
 	}
-
 }
