@@ -138,8 +138,9 @@ func getLink(node *html.Node) string {
 	return ""
 }
 
-func download(link string) error {
-	out, err := os.Create("output.txt")
+func download(link string, dest string) error {
+	filePath := dest + "temp.txt"
+	out, err := os.Create(filePath)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -158,15 +159,17 @@ func download(link string) error {
 	}
 	fmt.Printf("Downloading: %s\n", last)
 	_, err = io.Copy(out, resp.Body)
-	err = os.Rename("output.txt", last)
+	err = os.Rename(filePath, dest + last)
 
-	fmt.Printf("Done! Saved: %s\n", last)
+	fmt.Printf("Done! Saved: %s\n", dest + last)
 	return nil
 }
 
 func main() {
 	comic := flag.String("comic", "Swamp Thing", "What comic are we shooting for?")
+	dest := flag.String("dest", "downloads/", "Where do you want to save the comic?")
 	flag.Parse()
+	os.Mkdir(*dest, 0755)
 	fmt.Printf("Searching : %s\n", *comic)
 
 	// Find the page links
@@ -199,7 +202,7 @@ func main() {
 
 	// Download the file
 	for _, v := range urls {
-		err = download(v)
+		err = download(v, *dest)
 		if err == nil {
 			return
 		}
