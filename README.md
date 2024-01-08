@@ -1,6 +1,10 @@
 # Comicsdl
 CLI for downloading comics
 
+### Install
+`go install github.com/aeikenberry/comicsdl`
+
+### Usaage
 ```
 ❯ comicsdl --help
 Usage of comicsdl:
