@@ -159,9 +159,9 @@ func download(link string, dest string) error {
 	}
 	fmt.Printf("Downloading: %s\n", last)
 	_, err = io.Copy(out, resp.Body)
-	err = os.Rename(filePath, dest + last)
+	err = os.Rename(filePath, dest+last)
 
-	fmt.Printf("Done! Saved: %s\n", dest + last)
+	fmt.Printf("Done! Saved: %s\n", dest+last)
 	return nil
 }
 
@@ -169,13 +169,13 @@ func main() {
 	comic := flag.String("comic", "Swamp Thing", "What comic are we shooting for?")
 	dest := flag.String("dest", "downloads/", "Where do you want to save the comic?")
 	flag.Parse()
-  if !strings.HasSuffix(*dest, "/") {
-    suffix := "/"
-    destDir := *dest + suffix
-    os.Mkdir(destDir, 0755)
-  } else {
-    os.Mkdir(*dest, 0755)
-  }
+	if !strings.HasSuffix(*dest, "/") {
+		suffix := "/"
+		destDir := *dest + suffix
+		os.Mkdir(destDir, 0755)
+	} else {
+		os.Mkdir(*dest, 0755)
+	}
 	fmt.Printf("Searching : %s\n", *comic)
 
 	// Find the page links
