@@ -35,7 +35,7 @@ func parseSearch(doc *html.Node) ([]*SearchResult, error) {
 	if results != nil {
 		return results, nil
 	}
-	return nil, errors.New("No results found")
+	return nil, errors.New("no results found")
 }
 
 func setSearchResult(n *html.Node, r *SearchResult) {
@@ -77,7 +77,7 @@ func GetLinkURLS(doc *html.Node) ([]string, error) {
 		return links, nil
 	}
 
-	return nil, errors.New("No direct download found")
+	return nil, errors.New("no direct download found")
 }
 
 type SearchResult struct {
@@ -151,15 +151,15 @@ func download(link string, dest string) error {
 	}
 
 	defer resp.Body.Close()
-	urlStr, err := url.QueryUnescape(resp.Request.URL.String())
+	urlStr, _ := url.QueryUnescape(resp.Request.URL.String())
 	parts := strings.Split(urlStr, "/")
 	last := parts[len(parts)-1]
 	if !strings.Contains(last, ".cbz") && !strings.Contains(last, ".cbr") && !strings.Contains(last, ".zip") {
-		return errors.New("Invalid download")
+		return errors.New("invalid download")
 	}
 	fmt.Printf("Downloading: %s\n", last)
-	_, err = io.Copy(out, resp.Body)
-	err = os.Rename(filePath, dest+last)
+	_, _ = io.Copy(out, resp.Body)
+	_ = os.Rename(filePath, dest+last)
 
 	fmt.Printf("Done! Saved: %s\n", dest+last)
 	return nil
@@ -198,7 +198,7 @@ func main() {
 	selection := getUserSeletion(searchResults)
 
 	// Go to the url of their selection
-	doc, err = getParsedHTML(selection.URL)
+	doc, _ = getParsedHTML(selection.URL)
 
 	// Find the download links
 	urls, err := GetLinkURLS(doc)
